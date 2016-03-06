@@ -2,6 +2,8 @@
 
 namespace Bileto\TeamcityMessages;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
 use LogicException;
 
@@ -15,6 +17,8 @@ class Util
         '[' => '|[',
         ']' => '|]',
     ];
+
+    const TIMESTAMP_FORMAT = 'Y-m-d\TH:i:sO';
 
     /**
      * Return arbitrary message formatted according the TeamCity message protocol.
@@ -56,6 +60,22 @@ class Util
         if (!preg_match('/^[a-z][-a-z0-9]+$/i', $value)) {
             throw new InvalidArgumentException("Value '$value' is not valid Java ID.");
         }
+    }
+
+    /**
+     * Return date in format acceptable as TeamCity "timestamp" parameter.
+     *
+     * @param DateTimeInterface $date Either date with timestamp or `NULL` for now.
+     * @return string
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-MessageCreationTimestamp
+     */
+    public static function formatTimestamp(DateTimeInterface $date = null)
+    {
+        if (!$date) {
+            $date = new DateTimeImmutable();
+        }
+        
+        return $date->format(self::TIMESTAMP_FORMAT);
     }
 
     /**

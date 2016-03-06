@@ -3,6 +3,7 @@
 namespace Bileto\TeamcityMessages\Tests;
 
 use Bileto\TeamcityMessages\Util;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 
@@ -66,5 +67,19 @@ class UtilTest extends PHPUnit_Framework_TestCase
             'space' => [' '],
             'unicode' => ['č'],
         ];
+    }
+
+    public function testFormatTimestamp()
+    {
+        $now = new DateTimeImmutable('2000-01-01 12:34:56 Europe/Prague');
+        self::assertSame('2000-01-01T12:34:56+0100', Util::formatTimestamp($now));
+    }
+
+    public function testFormatTimestampNow()
+    {
+        $now = new DateTimeImmutable();
+        $result = Util::formatTimestamp();
+
+        self::assertEquals($now, new DateTimeImmutable($result), '', 1);
     }
 }

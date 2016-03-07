@@ -125,8 +125,7 @@ class MessageLoggerTest extends PHPUnit_Framework_TestCase
                 function(MessageLogger $logger) {
                     $logger->progressFinish('Foo');
                 },
-                "##teamcity[progressFinish timestamp='*' message='Foo']
-                ",
+                "##teamcity[progressFinish timestamp='*' message='Foo']",
             ],
 //            '' => [
 //                function(MessageLogger $logger) {

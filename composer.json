@@ -1,5 +1,5 @@
 {
-	"name": "bileto/teamcity-messages",
+	"name": "michal-kocarek/teamcity-messages",
 	"description": "Format and write TeamCity service messages.",
 	"version": "1.0.0",
 	"keywords": [
@@ -11,10 +11,6 @@
 		{
 			"name": "Michal Kočárek",
 			"email": "michal.kocarek@brainbox.cz"
-		},
-		{
-			"name": "Bileto Developers",
-			"email": "info@bileto.com"
 		}
 	],
 	"require": {

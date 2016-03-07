@@ -1,7 +1,7 @@
 # TeamCity Messages
 
 [![Build Status](https://travis-ci.org/michal-kocarek/teamcity-messages.svg?branch=master)](https://travis-ci.org/michal-kocarek/teamcity-messages)
-[![Coverage Status](https://coveralls.io/repos/github/michal-kocarek/teamcity-messages/badge.svg?branch=travis-config)](https://coveralls.io/github/michal-kocarek/teamcity-messages?branch=travis-config)
+[![Coverage Status](https://coveralls.io/repos/github/michal-kocarek/teamcity-messages/badge.svg?branch=master)](https://coveralls.io/github/michal-kocarek/teamcity-messages?branch=master)
 
 BLABLABLAH This piece of software is an easy pre-cooked, and configured composer package with phpunit.
 

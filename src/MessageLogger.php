@@ -1,7 +1,7 @@
 <?php
 
-namespace Bileto\TeamcityMessages;
-use Bileto\TeamcityMessages\Writers\Writer;
+namespace MichalKocarek\TeamcityMessages;
+use MichalKocarek\TeamcityMessages\Writers\Writer;
 
 /**
  * Instance is able to write TeamCity messages through one of the writers.

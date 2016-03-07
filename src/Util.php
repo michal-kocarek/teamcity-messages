@@ -1,6 +1,6 @@
 <?php
 
-namespace Bileto\TeamcityMessages;
+namespace MichalKocarek\TeamcityMessages;
 
 use DateTimeImmutable;
 use DateTimeInterface;

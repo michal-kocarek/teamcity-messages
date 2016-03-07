@@ -1,9 +1,9 @@
 <?php
 
-namespace Bileto\TeamcityMessages\Tests;
+namespace MichalKocarek\TeamcityMessages\Tests;
 
-use Bileto\TeamcityMessages\MessageLogger;
-use Bileto\TeamcityMessages\Writers\StdoutWriter;
+use MichalKocarek\TeamcityMessages\MessageLogger;
+use MichalKocarek\TeamcityMessages\Writers\StdoutWriter;
 use PHPUnit_Framework_TestCase;
 
 class MessageLoggerTest extends PHPUnit_Framework_TestCase

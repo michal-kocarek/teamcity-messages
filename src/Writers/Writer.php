@@ -1,6 +1,6 @@
 <?php
 
-namespace Bileto\TeamcityMessages\Writers;
+namespace MichalKocarek\TeamcityMessages\Writers;
 
 /**
  * Contract defines method {@link Writer::write()} that is capable

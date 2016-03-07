@@ -1,6 +1,6 @@
 <?php
 
-namespace Bileto\TeamcityMessages\Writers;
+namespace MichalKocarek\TeamcityMessages\Writers;
 
 /**
  * Instance echoes messages to standard output.

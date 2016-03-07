@@ -1,8 +1,8 @@
 <?php
 
-namespace Bileto\TeamcityMessages\Tests\Writers;
+namespace MichalKocarek\TeamcityMessages\Tests\Writers;
 
-use Bileto\TeamcityMessages\Writers\StdoutWriter;
+use MichalKocarek\TeamcityMessages\Writers\StdoutWriter;
 use PHPUnit_Framework_TestCase;
 
 class StdoutWriterTest extends PHPUnit_Framework_TestCase

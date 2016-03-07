@@ -1,25 +1,47 @@
 # TeamCity Messages
 
+This PHP library simplifies formatting and writing TeamCity service messages.
+
 [![Build Status](https://travis-ci.org/michal-kocarek/teamcity-messages.svg?branch=master)](https://travis-ci.org/michal-kocarek/teamcity-messages)
 [![Coverage Status](https://coveralls.io/repos/github/michal-kocarek/teamcity-messages/badge.svg?branch=master)](https://coveralls.io/github/michal-kocarek/teamcity-messages?branch=master)
 
-BLABLABLAH This piece of software is an easy pre-cooked, and configured composer package with phpunit.
+## Installation
+
+To add TeamcityMessages as a local, per-project dependency to your project, simply add a dependency on `michal-kocarek/teamcity-messages` to your project's `composer.json` file.
+Here is a minimal example of a `composer.json` file that just defines a dependency on TeamcityMessages 0.1:
+
+    {
+        "require": {
+            "michal-kocarek/teamcity-messages": "^0.1"
+        }
+    }
+
 
 ## Usage
 
-// TODO: Modify this readme.
-// TODO: Add travis to build tests.
+Here's the basic example. MessageLogger instance dumps everything through the writer.
 
-- Clone this repo: `git clone git@github.com:michal-kocarek/teamcity-messages.git`
-- Go to project directory: `cd teamcity-messages`
-- Download Composer: `wget http://getcomposer.org/composer.phar`
-- Update composer.json with your own data
-- Install dependencies: `php composer.phar install`
-- Check everything is ok, running `phpunit`
+StdOutWriter echoes output directly to script standard output.
 
-### That's it!
+```php
+use MichalKocarek\TeamcityMessages\MessageLogger;
+use MichalKocarek\TeamcityMessages\Writers\StdoutWriter;
 
+$logger = new MessageLogger(new StdoutWriter());
 
+$logger->progressMessage('Reticulating splines...');
+
+$logger->block('Counting llamas...', null, function(MessageLogger $logger) {
+    $logger->warning('Too many llamas!');
+    $logger->publishArtifacts('logs/llamas-count.csv');
+});
+```
+
+See PhpDoc for MessageLogger public methods for more info about the usage.
+
+## Links
+
+* [Build Script Interaction with TeamCity](https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity)
 
 ## Authors
 

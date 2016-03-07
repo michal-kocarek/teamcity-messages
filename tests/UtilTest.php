@@ -1,8 +1,8 @@
 <?php
 
-namespace Bileto\TeamcityMessages\Tests;
+namespace MichalKocarek\TeamcityMessages\Tests;
 
-use Bileto\TeamcityMessages\Util;
+use MichalKocarek\TeamcityMessages\Util;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;

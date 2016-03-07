@@ -49,4 +49,4 @@ Michal Kočárek <michal.kocarek@brainbox.cz> - <https://twitter.com/michalkocar
 
 ## License
 
-This library is licensed under the MIT License – see the [LICENSE](LICENSE.md) file for details.
+This library is licensed under the MIT License – see the [LICENSE](LICENSE.txt) file for details.

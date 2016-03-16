@@ -30,6 +30,7 @@ class UtilTest extends PHPUnit_Framework_TestCase
         return [
             'simple' => ['foo', [], "##teamcity[foo]"],
             'simple-params' => ['start', ['bar' => 'baz'], "##teamcity[start bar='baz']"],
+            'no-key' => ['foo', ['bar'], "##teamcity[foo 'bar']"],
             'empty-param' => ['foo', ['bar' => ''], "##teamcity[foo bar='']"],
             'escape-quote' => ['start', ['bar' => ' \' '], "##teamcity[start bar=' |' ']"],
             'escape-nl' => ['start', ['bar' => " \n "], "##teamcity[start bar=' |n ']"],
@@ -69,10 +70,20 @@ class UtilTest extends PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testNowMicro()
+    {
+        $now = microtime(true);
+        $date = Util::nowMicro();
+
+        $time = (float) $date->format('U.u');
+
+        self::assertEquals($now, $time, '', 1.0);
+    }
+
     public function testFormatTimestamp()
     {
-        $now = new DateTimeImmutable('2000-01-01 12:34:56 Europe/Prague');
-        self::assertSame('2000-01-01T12:34:56+0100', Util::formatTimestamp($now));
+        $now = new DateTimeImmutable('2000-01-01 12:34:56.12345 Europe/Prague');
+        self::assertSame('2000-01-01T12:34:56.123450+0100', Util::formatTimestamp($now));
     }
 
     public function testFormatTimestampNow()
@@ -80,6 +91,6 @@ class UtilTest extends PHPUnit_Framework_TestCase
         $now = new DateTimeImmutable();
         $result = Util::formatTimestamp();
 
-        self::assertEquals($now, new DateTimeImmutable($result), '', 1);
+        self::assertEquals($now, new DateTimeImmutable($result), '', 1.0);
     }
 }

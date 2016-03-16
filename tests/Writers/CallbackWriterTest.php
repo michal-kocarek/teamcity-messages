@@ -2,12 +2,12 @@
 
 namespace MichalKocarek\TeamcityMessages\Tests\Writers;
 
-use MichalKocarek\TeamcityMessages\Writers\StdoutWriter;
+use MichalKocarek\TeamcityMessages\Writers\CallbackWriter;
 use PHPUnit_Framework_TestCase;
 
 require_once(__DIR__.'/DataProvider.php');
 
-class StdoutWriterTest extends PHPUnit_Framework_TestCase
+class CallbackWriterTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider dataProviderWrite
@@ -15,14 +15,14 @@ class StdoutWriterTest extends PHPUnit_Framework_TestCase
      */
     public function testWrite(...$messages)
     {
-        $writer = new StdoutWriter();
+        $result = '';
+        $writer = new CallbackWriter(function($message) use(&$result) {
+            $result .= $message;
+        });
 
-        ob_start();
         foreach($messages as $message) {
             $writer->write($message);
         }
-
-        $result = ob_get_clean();
 
         $expected = implode($messages);
         self::assertSame($expected, $result);

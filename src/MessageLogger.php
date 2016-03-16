@@ -1,6 +1,7 @@
 <?php
 
 namespace MichalKocarek\TeamcityMessages;
+use InvalidArgumentException;
 use MichalKocarek\TeamcityMessages\Writers\Writer;
 
 /**
@@ -8,10 +9,30 @@ use MichalKocarek\TeamcityMessages\Writers\Writer;
  */
 class MessageLogger
 {
+    //region Importing XML Reports TypeID constants
+
+    /**
+     * JUnit Ant task XML reports
+     */
+    const IMPORT_TYPE_TEST_JUNIT = 'junit';
+
+    /**
+     * PMD inspections XML reports
+     */
+    const IMPORT_TYPE_INSPECTION_PMD = 'pmd';
+
+    /**
+     * PMD Copy/Paste Detector (CPD) XML reports
+     */
+    const IMPORT_TYPE_DUPLICATION_PMD_CPD = 'pmdCpd';
+
+    //endregion
+
     /**
      * @var string|null
      */
     private $flowId;
+
     /**
      * @var Writer
      */
@@ -70,47 +91,47 @@ class MessageLogger
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function message($text)
+    public function logMessage($text)
     {
-        $this->logMessage($text, 'NORMAL');
+        $this->writeLogMessage($text, 'NORMAL');
     }
 
     /**
-     * Prints warning message.
+     * Prints warning.
      *
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function warning($text)
+    public function logWarning($text)
     {
-        $this->logMessage($text, 'WARNING');
+        $this->writeLogMessage($text, 'WARNING');
     }
 
     /**
-     * Prints failure message.
+     * Prints failure.
      *
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function failure($text)
+    public function logFailure($text)
     {
-        $this->logMessage($text, 'FAILURE');
+        $this->writeLogMessage($text, 'FAILURE');
     }
 
     /**
-     * Prints error message.
+     * Prints error.
      *
      * Note that this message fails the build if setting
      * `Fail build if an error message is logged by build runner`
      * is enabled for the build.
      *
      * @param string $text The message.
-     * @param string $errorDetails The error details (e.g. stack strace).
+     * @param string|null $errorDetails The error details (e.g. stack strace).
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function error($text, $errorDetails = null)
+    public function logError($text, $errorDetails = null)
     {
-        $this->logMessage($text, 'ERROR', $errorDetails);
+        $this->writeLogMessage($text, 'ERROR', $errorDetails);
     }
 
     //endregion
@@ -224,7 +245,167 @@ class MessageLogger
 
     //region Reporting Tests
 
-    // TODO: Implement testSuiteStarted, testSuiteFinished, testStarted, testFinished, testIgnored, testStdOut, testStdErr messages.
+    /**
+     * Report that test suite started.
+     *
+     * @param string $name The test suite name.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testSuiteStarted($name)
+    {
+        $this->write('testSuiteStarted', [
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * Report that test suite finished.
+     *
+     * @param string $name The test suite name.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testSuiteFinished($name)
+    {
+        $this->write('testSuiteFinished', [
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * Report that test started.
+     *
+     * After test start, finish message should be written using {@link testFinished()}.
+     *
+     * @param string $name The test name.
+     * @param bool $captureStandardOutput If true, all the standard output (and standard error) messages are considered as test output.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testStarted($name, $captureStandardOutput = false)
+    {
+        $this->write('testStarted', [
+            'name' => $name,
+            'captureStandardOutput' => $captureStandardOutput,
+        ]);
+    }
+
+    /**
+     * Report that test started.
+     *
+     * @param string $name The test name.
+     * @param float $duration The test duration in seconds.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testFinished($name, $duration = null)
+    {
+        $this->write('testFinished', [
+            'name' => $name,
+            'duration' => $duration !== null ? round($duration * 10000000) : null,
+        ]);
+    }
+
+    /**
+     * Report that test has failed.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one testFailed message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual representation of the error.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     */
+    public function testFailed($name, $message, $details = null)
+    {
+        $this->write('testFailed', [
+            'name' => $name,
+            'message' => $message,
+            'details' => $details,
+        ]);
+    }
+
+    /* @noinspection MoreThanThreeArgumentsInspection */
+    /**
+     * Report that test has failed providing the comparison of expected and actual data.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one testFailed message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual representation of the error.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     * @param string $actual The actual value.
+     * @param string $expected The expected value.
+     */
+    public function testFailedWithComparison($name, $message, $details = null, $actual, $expected)
+    {
+        $this->write('testFailed', [
+            'name' => $name,
+            'message' => $message,
+            'type' => 'comparisonFailure',
+            'details' => $details,
+            'actual' => $actual,
+            'expected' => $expected,
+        ]);
+    }
+
+    /**
+     * Report that test was not run (ignored) by the testing framework.
+     *
+     * As an exception, message can be reported without the matching testStarted and testFinished messages.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual description of why test was not run.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     */
+    public function testIgnored($name, $message, $details = null)
+    {
+        $this->write('testIgnored', [
+            'name' => $name,
+            'message' => $message,
+            'details' => $details,
+        ]);
+    }
+
+    /**
+     * Report standard output of the test.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one `testStdOut` message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $out The output.
+     */
+    public function testStdOut($name, $out)
+    {
+        $this->write('testStdOut', [
+            'name' => $name,
+            'out' => $out,
+        ]);
+    }
+
+    /**
+     * Report error output of the test.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one `testStdErr` message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $out The output.
+     */
+    public function testStdErr($name, $out)
+    {
+        $this->write('testStdErr', [
+            'name' => $name,
+            'out' => $out,
+        ]);
+    }
 
     //endregion
 
@@ -267,6 +448,13 @@ class MessageLogger
         ]);
     }
 
+    /**
+     * Write progress message (e.g. to mark long-running parts in a build script).
+     *
+     * Message will be shown until {@link progressFinish()} is called.
+     *
+     * @param string $message The message.
+     */
     public function progressStart($message)
     {
         $this->write('progressStart', [
@@ -274,6 +462,13 @@ class MessageLogger
         ]);
     }
 
+    /**
+     * Mark end of last progress message (e.g. to mark long-running parts in a build script).
+     *
+     * Expected to be called after {@link progressStart()}.
+     *
+     * @param string $message The message.
+     */
     public function progressFinish($message)
     {
         $this->write('progressFinish', [
@@ -281,6 +476,13 @@ class MessageLogger
         ]);
     }
 
+    /**
+     * Write progress message (e.g. to mark long-running parts in a build script) during the callback execution.
+     *
+     * @param string $message The message.
+     * @param callable $callback Callback that is called inside block. First argument passed is this instance.
+     * @return mixed The callback return value.
+     */
     public function progress($message, callable $callback)
     {
         $this->progressStart($message);
@@ -295,27 +497,68 @@ class MessageLogger
 
     //region Reporting Build Problems
 
+    /**
+     * Write "Build Problem" message.
+     *
+     * Build problems appear on the Build Results page and also affect the build status text.
+     *
+     * @param string $description The text describing the build problem. Text exceeding 4000 symbols will be truncated.
+     * @param string|null $identity The unique problem ID in format of valid Java ID. Identity should be same for same build problems.
+     */
     public function buildProblem($description, $identity = null)
     {
+        if ($identity !== null) {
+            Util::ensureValidJavaId($identity);
+        }
         
+        $this->write('buildProblem', [
+            'description' => $description,
+            'identity' => $identity,
+        ]);
     }
     
     //endregion
 
     //region Reporting Build Status
 
+    /**
+     * Write "Build Status" message.
+     *
+     * Allows changing build status text from the build script. You can also change the build status of a failing build to success.
+     *
+     * Optionally, the text can use `{build.status.text}` substitution pattern which represents the status, calculated by TeamCity automatically using passed test count, compilation messages and so on.
+     *
+     * @param string $status The status. Only allowed value is: `SUCCESS`.
+     * @param string $text The new build status text.
+     */
     public function buildStatus($status = null, $text = null)
     {
-        
+        if ($status === null && $text === null) {
+            throw new InvalidArgumentException('At least one argument must be non-null.');
+        }
+
+        $this->write('buildStatus', [
+            'status' => $status,
+            'text' => $text,
+        ]);
     }
 
     //endregion
     
     //region Reporting Build Number
 
+    /**
+     * Set a custom build number directly.
+     *
+     * You can use the `{build.number}` substitution to use the current build number automatically generated by TeamCity.
+     *
+     * @param string $buildNumber
+     */
     public function buildNumber($buildNumber)
     {
-
+        $this->write('buildNumber', [
+            $buildNumber,
+        ]);
     }
     
     //endregion
@@ -323,14 +566,23 @@ class MessageLogger
     //region Adding or Changing a Build Parameter
 
     /**
-     * @param $name
-     * @param $value
+     * Update build parameter value.
      *
-     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-AddingorChangingaBuildParameter
+     * Note the parameters need to be defined in the Parameters section of the build configuration.
+     *
+     * Note some parameters must be specified including their prefix (e.g. `system` or `env`).
+     *
+     * @param string $name The parameter name.
+     * @param string $value The parameter value.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Configuring+Build+Parameters TeamCity – Configuring Build Parameters
      */
     public function setParameter($name, $value)
     {
-
+        $this->write('setParameter', [
+            'name' => $name,
+            'value' => $value,
+        ]);
     }
     
     //endregion
@@ -338,49 +590,92 @@ class MessageLogger
     //region Reporting Build Statistics
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key The name of custom statistical data.
+     * @param int|float $value The value should be a positive/negative integer of up to 13 digits (Since TeamCity 9.0, float values with up to 6 decimal places are also supported.).
      *
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildStatistics
      */
     public function buildStatisticValue($key, $value)
     {
-        
+        $this->write('buildStatisticValue', [
+            'key' => $key,
+            'value' => $value,
+        ]);
     }
     
     //endregion
 
     //region Disabling Service Messages Processing
 
-    public function serviceMessagesEnable()
+    /**
+     * Disable parsing of service messages in the output.
+     *
+     * Parsing is toggled back using {@link enableServiceMessages()}.
+     */
+    public function disableServiceMessages()
     {
-        
+        $this->write('disableServiceMessages', []);
     }
 
-    public function serviceMessagesDisable()
+    /**
+     * Reenable parsing of service messages in the output.
+     *
+     * Useful when parsing was disabled using {@link disableServiceMessages()}.
+     */
+    public function enableServiceMessages()
     {
-        
+        $this->write('enableServiceMessages', []);
     }
 
-    // TODO: Fix that fucking name
+    /**
+     * Disable parsing of service messages emitted from inside a callback.
+     *
+     * @param callable $callback Callback that is called inside block. First argument passed is this instance.
+     * @return mixed The callback return value.
+     */
     public function withoutServiceMessages(callable $callback)
     {
-        
+        $this->disableServiceMessages();
+        try {
+            return $callback($this);
+        } finally {
+            $this->enableServiceMessages();
+        }
     }
     
     //endregion
     
     //region Importing XML Reports
 
-    public function importData($type, $path)
+    /* @noinspection MoreThanThreeArgumentsInspection */
+    /**
+     * Import test results data.
+     *
+     * @param string $type One of `self::IMPORT_TYPE_*` constants.
+     * @param string $path Relative path to the XML file inside the checkout directory.
+     * @param bool|null $parseOutOfDate False (default) processes only files updated during the build (determined by last modification timestamp).
+     * @param string|null $whenNoDataPublished Change output level of when no reports are found (`info` (default), `nothing`, `warning`, `error`).
+     * @param bool|null $verbose True enables detailed logging into the build log.
+     */
+    public function importData($type, $path, $parseOutOfDate = null, $whenNoDataPublished = null, $verbose = null)
     {
-        // TODO: Tohle bere ještě nějaký argumenty navíc!
-        
+        $this->write('importData', [
+            'type' => $type,
+            'path' => $path,
+            'parseOutOfDate' => $parseOutOfDate,
+            'whenNoDataPublished' => $whenNoDataPublished,
+            'verbose' => $verbose,
+        ]);
     }
     
     //endregion
 
-    private function logMessage($text, $status, $errorDetails = null)
+    /**
+     * @param string $text
+     * @param string $status
+     * @param null|string $errorDetails
+     */
+    private function writeLogMessage($text, $status, $errorDetails = null)
     {
         $this->write('message', [
             'text' => $text,

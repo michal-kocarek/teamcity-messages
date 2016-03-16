@@ -18,7 +18,7 @@ class Util
         ']' => '|]',
     ];
 
-    const TIMESTAMP_FORMAT = 'Y-m-d\TH:i:sO';
+    const TIMESTAMP_FORMAT = 'Y-m-d\TH:i:s.uO';
 
     /**
      * Return arbitrary message formatted according the TeamCity message protocol.
@@ -72,7 +72,7 @@ class Util
     public static function formatTimestamp(DateTimeInterface $date = null)
     {
         if (!$date) {
-            $date = new DateTimeImmutable();
+            $date = self::nowMicro();
         }
         
         return $date->format(self::TIMESTAMP_FORMAT);
@@ -96,6 +96,25 @@ class Util
                 throw new LogicException('Unexpected value.');
             }
         }, $value);
+    }
+
+    /**
+     * Get current time with microseconds included.
+     *
+     * @return DateTimeImmutable
+     */
+    public static function nowMicro()
+    {
+        // This is kinda hacky way, because you can't simply ask for DateTime with microseconds in PHP
+
+        list($microseconds, $timestamp) = explode(' ', microtime());
+
+        // extract first six microsecond digits from string "0.12345678" as DateTime won't accept more
+        $microseconds = substr($microseconds, 3, 6);
+
+        // order of format matters; timestamp sets timezone and set microseconds to zero;
+        // that's why microseconds must be set after parsing the timestamp
+        return DateTimeImmutable::createFromFormat('U u', "$timestamp $microseconds");
     }
 
 }

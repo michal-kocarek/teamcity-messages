@@ -226,59 +226,166 @@ class MessageLogger
 
     //region Reporting Tests
 
-    // TODO: Zjistit, co to je "testCount" zpráva
-    // TODO: Zjistit, jak funguje "locationHint".
-
-    public function testSuiteStarted()
+    /**
+     * Report that test suite started.
+     *
+     * @param string $name The test suite name.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testSuiteStarted($name)
     {
         $this->write('testSuiteStarted', [
-
+            'name' => $name,
         ]);
     }
 
-    public function testSuiteFinished()
+    /**
+     * Report that test suite finished.
+     *
+     * @param string $name The test suite name.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testSuiteFinished($name)
     {
         $this->write('testSuiteFinished', [
-
+            'name' => $name,
         ]);
     }
 
-    public function testStarted()
+    /**
+     * Report that test started.
+     *
+     * After test start, finish message should be written using {@link testFinished()}.
+     *
+     * @param string $name The test name.
+     * @param bool $captureStandardOutput If true, all the standard output (and standard error) messages are considered as test output.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testStarted($name, $captureStandardOutput = false)
     {
         $this->write('testStarted', [
-
+            'name' => $name,
+            'captureStandardOutput' => $captureStandardOutput,
         ]);
     }
 
-    public function testFinished()
+    /**
+     * Report that test started.
+     *
+     * @param string $name The test name.
+     * @param float $duration The test duration in seconds.
+     *
+     * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-Interpretingtestnames TeamCity – Interpreting Test Names
+     */
+    public function testFinished($name, $duration = null)
     {
         $this->write('testFinished', [
-
+            'name' => $name,
+            'duration' => $duration !== null ? round($duration * 10000000) : null,
         ]);
     }
 
-    public function testIgnored()
+    /**
+     * Report that test has failed.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one testFailed message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual representation of the error.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     */
+    public function testFailed($name, $message, $details = null)
+    {
+        $this->write('testFailed', [
+            'name' => $name,
+            'message' => $message,
+            'details' => $details,
+        ]);
+    }
+
+    /**
+     * Report that test has failed providing the comparison of expected and actual data.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one testFailed message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual representation of the error.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     * @param string $actual The actual value.
+     * @param string $expected The expected value.
+     */
+    public function testFailedWithComparison($name, $message, $details = null, $actual, $expected)
+    {
+        $this->write('testFailed', [
+            'name' => $name,
+            'message' => $message,
+            'type' => 'comparisonFailure',
+            'details' => $details,
+            'actual' => $actual,
+            'expected' => $expected,
+        ]);
+    }
+
+    /**
+     * Report that test was not run (ignored) by the testing framework.
+     *
+     * As an exception, message can be reported without the matching testStarted and testFinished messages.
+     *
+     * @param string $name The test name.
+     * @param string $message The textual description of why test was not run.
+     * @param string $details The information on the test failure, typically a message and an exception stacktrace.
+     */
+    public function testIgnored($name, $message, $details = null)
     {
         $this->write('testIgnored', [
-
+            'name' => $name,
+            'message' => $message,
+            'details' => $details,
         ]);
     }
 
-    public function testStdOut()
+    /**
+     * Report standard output of the test.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one `testStdOut` message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $out The output.
+     */
+    public function testStdOut($name, $out)
     {
         $this->write('testStdOut', [
-
+            'name' => $name,
+            'out' => $out,
         ]);
     }
 
-    public function testStdErr()
+    /**
+     * Report error output of the test.
+     *
+     * Message should be written inside the {@link testStarted()} and {@link testFinished()} block.
+     *
+     * Only one `testStdErr` message can appear for a given test name.
+     *
+     * @param string $name The test name.
+     * @param string $out The output.
+     */
+    public function testStdErr($name, $out)
     {
         $this->write('testStdErr', [
-
+            'name' => $name,
+            'out' => $out,
         ]);
     }
-
-    // TODO: Implement testSuiteStarted, testSuiteFinished, testStarted, testFinished, testIgnored, testStdOut, testStdErr messages.
 
     //endregion
 

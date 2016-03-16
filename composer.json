@@ -1,7 +1,7 @@
 {
 	"name": "michal-kocarek/teamcity-messages",
 	"description": "Format and write TeamCity service messages.",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"keywords": [
 		"teamcity"
 	],

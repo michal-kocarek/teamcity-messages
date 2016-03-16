@@ -72,47 +72,47 @@ class MessageLogger
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function message($text)
+    public function logMessage($text)
     {
-        $this->logMessage($text, 'NORMAL');
+        $this->writeLogMessage($text, 'NORMAL');
     }
 
     /**
-     * Prints warning message.
+     * Prints warning.
      *
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function warning($text)
+    public function logWarning($text)
     {
-        $this->logMessage($text, 'WARNING');
+        $this->writeLogMessage($text, 'WARNING');
     }
 
     /**
-     * Prints failure message.
+     * Prints failure.
      *
      * @param string $text The message.
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function failure($text)
+    public function logFailure($text)
     {
-        $this->logMessage($text, 'FAILURE');
+        $this->writeLogMessage($text, 'FAILURE');
     }
 
     /**
-     * Prints error message.
+     * Prints error.
      *
      * Note that this message fails the build if setting
      * `Fail build if an error message is logged by build runner`
      * is enabled for the build.
      *
      * @param string $text The message.
-     * @param string $errorDetails The error details (e.g. stack strace).
+     * @param string|null $errorDetails The error details (e.g. stack strace).
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingMessagesForBuildLogReportingMessagesForBuildLog
      */
-    public function error($text, $errorDetails = null)
+    public function logError($text, $errorDetails = null)
     {
-        $this->logMessage($text, 'ERROR', $errorDetails);
+        $this->writeLogMessage($text, 'ERROR', $errorDetails);
     }
 
     //endregion
@@ -623,7 +623,7 @@ class MessageLogger
      * @param string $status
      * @param null|string $errorDetails
      */
-    private function logMessage($text, $status, $errorDetails = null)
+    private function writeLogMessage($text, $status, $errorDetails = null)
     {
         $this->write('message', [
             'text' => $text,

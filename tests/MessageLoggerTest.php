@@ -45,31 +45,31 @@ class MessageLoggerTest extends PHPUnit_Framework_TestCase
         return [
             'message' => [
                 function(MessageLogger $logger) {
-                    $logger->message('Foo');
+                    $logger->logMessage('Foo');
                 },
                 "##teamcity[message timestamp='*' text='Foo' status='NORMAL']",
             ],
             'warning' => [
                 function(MessageLogger $logger) {
-                    $logger->warning('Foo');
+                    $logger->logWarning('Foo');
                 },
                 "##teamcity[message timestamp='*' text='Foo' status='WARNING']",
             ],
             'failure' => [
                 function(MessageLogger $logger) {
-                    $logger->failure('Foo');
+                    $logger->logFailure('Foo');
                 },
                 "##teamcity[message timestamp='*' text='Foo' status='FAILURE']",
             ],
             'error' => [
                 function(MessageLogger $logger) {
-                    $logger->error('Foo');
+                    $logger->logError('Foo');
                 },
                 "##teamcity[message timestamp='*' text='Foo' status='ERROR']",
             ],
             'error-with-details' => [
                 function(MessageLogger $logger) {
-                    $logger->error('Foo', 'some-stacktrace');
+                    $logger->logError('Foo', 'some-stacktrace');
                 },
                 "##teamcity[message timestamp='*' text='Foo' status='ERROR' errorDetails='some-stacktrace']",
             ],

@@ -8,11 +8,11 @@ This PHP library simplifies formatting and writing TeamCity service messages.
 ## Installation
 
 To add TeamcityMessages as a local, per-project dependency to your project, simply add a dependency on `michal-kocarek/teamcity-messages` to your project's `composer.json` file.
-Here is a minimal example of a `composer.json` file that just defines a dependency on TeamcityMessages 0.1:
+Here is a minimal example of a `composer.json` file that just defines a dependency on TeamcityMessages 0.2:
 
     {
         "require": {
-            "michal-kocarek/teamcity-messages": "^0.1"
+            "michal-kocarek/teamcity-messages": "^0.2"
         }
     }
 

@@ -5,6 +5,8 @@ namespace MichalKocarek\TeamcityMessages\Tests\Writers;
 use MichalKocarek\TeamcityMessages\Writers\StdoutWriter;
 use PHPUnit_Framework_TestCase;
 
+require_once(__DIR__.'/DataProvider.php');
+
 class StdoutWriterTest extends PHPUnit_Framework_TestCase
 {
     /**
@@ -13,8 +15,6 @@ class StdoutWriterTest extends PHPUnit_Framework_TestCase
      */
     public function testWrite(...$messages)
     {
-        $expected = implode($messages);
-
         $writer = new StdoutWriter();
 
         ob_start();
@@ -24,15 +24,12 @@ class StdoutWriterTest extends PHPUnit_Framework_TestCase
 
         $result = ob_get_clean();
 
+        $expected = implode($messages);
         self::assertSame($expected, $result);
     }
 
     public function dataProviderWrite()
     {
-        return [
-            [''],
-            ['a message'],
-            ['a message'.PHP_EOL, 'another'.PHP_EOL],
-        ];
+        return DataProvider::getMessages();
     }
 }

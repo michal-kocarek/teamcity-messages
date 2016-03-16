@@ -9,6 +9,25 @@ use MichalKocarek\TeamcityMessages\Writers\Writer;
  */
 class MessageLogger
 {
+    //region Importing XML Reports TypeID constants
+
+    /**
+     * JUnit Ant task XML reports
+     */
+    const IMPORT_TYPE_TEST_JUNIT = 'junit';
+
+    /**
+     * PMD inspections XML reports
+     */
+    const IMPORT_TYPE_INSPECTION_PMD = 'pmd';
+
+    /**
+     * PMD Copy/Paste Detector (CPD) XML reports
+     */
+    const IMPORT_TYPE_DUPLICATION_PMD_CPD = 'pmdCpd';
+
+    //endregion
+
     /**
      * @var string|null
      */
@@ -308,6 +327,7 @@ class MessageLogger
         ]);
     }
 
+    /* @noinspection MoreThanThreeArgumentsInspection */
     /**
      * Report that test has failed providing the comparison of expected and actual data.
      *
@@ -428,7 +448,13 @@ class MessageLogger
         ]);
     }
 
-    // TODO: PhpDoc for these methods
+    /**
+     * Write progress message (e.g. to mark long-running parts in a build script).
+     *
+     * Message will be shown until {@link progressFinish()} is called.
+     *
+     * @param string $message The message.
+     */
     public function progressStart($message)
     {
         $this->write('progressStart', [
@@ -436,6 +462,13 @@ class MessageLogger
         ]);
     }
 
+    /**
+     * Mark end of last progress message (e.g. to mark long-running parts in a build script).
+     *
+     * Expected to be called after {@link progressStart()}.
+     *
+     * @param string $message The message.
+     */
     public function progressFinish($message)
     {
         $this->write('progressFinish', [
@@ -443,6 +476,13 @@ class MessageLogger
         ]);
     }
 
+    /**
+     * Write progress message (e.g. to mark long-running parts in a build script) during the callback execution.
+     *
+     * @param string $message The message.
+     * @param callable $callback Callback that is called inside block. First argument passed is this instance.
+     * @return mixed The callback return value.
+     */
     public function progress($message, callable $callback)
     {
         $this->progressStart($message);
@@ -607,12 +647,24 @@ class MessageLogger
     
     //region Importing XML Reports
 
-    public function importData($type, $path)
+    /* @noinspection MoreThanThreeArgumentsInspection */
+    /**
+     * Import test results data.
+     *
+     * @param string $type One of `self::IMPORT_TYPE_*` constants.
+     * @param string $path Relative path to the XML file inside the checkout directory.
+     * @param bool|null $parseOutOfDate False (default) processes only files updated during the build (determined by last modification timestamp).
+     * @param string|null $whenNoDataPublished Change output level of when no reports are found (`info` (default), `nothing`, `warning`, `error`).
+     * @param bool|null $verbose True enables detailed logging into the build log.
+     */
+    public function importData($type, $path, $parseOutOfDate = null, $whenNoDataPublished = null, $verbose = null)
     {
-        // TODO: Tohle bere ještě nějaký argumenty navíc! – možná rozdělit na více metod podle rozdílných argumentů
-
         $this->write('importData', [
-
+            'type' => $type,
+            'path' => $path,
+            'parseOutOfDate' => $parseOutOfDate,
+            'whenNoDataPublished' => $whenNoDataPublished,
+            'verbose' => $verbose,
         ]);
     }
     

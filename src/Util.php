@@ -37,9 +37,19 @@ class Util
 
         $result = '##teamcity[' . $messageName;
         foreach ($properties as $propertyName => $propertyValue) {
-            self::ensureValidJavaId($propertyName);
+            $escapedValue = self::escape($propertyValue);
 
-            $result .= ' ' . $propertyName . "='" . self::escape($propertyValue) . "'";
+            if (is_int($propertyName)) {
+                // Value without name; skip the key and dump just the value
+
+                $result .= " '$escapedValue'";
+            } else {
+                // Classic name=value pair
+
+                self::ensureValidJavaId($propertyName);
+                $result .= " $propertyName='$escapedValue'";
+            }
+
         }
         $result .= ']'.PHP_EOL;
 
@@ -55,7 +65,7 @@ class Util
      * @return bool
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-servMsgsServiceMessages TeamCity – Service Messages
      */
-    private static function ensureValidJavaId($value)
+    public static function ensureValidJavaId($value)
     {
         if (!preg_match('/^[a-z][-a-z0-9]+$/i', $value)) {
             throw new InvalidArgumentException("Value '$value' is not valid Java ID.");

@@ -30,6 +30,7 @@ class UtilTest extends PHPUnit_Framework_TestCase
         return [
             'simple' => ['foo', [], "##teamcity[foo]"],
             'simple-params' => ['start', ['bar' => 'baz'], "##teamcity[start bar='baz']"],
+            'no-key' => ['foo', ['bar'], "##teamcity[foo 'bar']"],
             'empty-param' => ['foo', ['bar' => ''], "##teamcity[foo bar='']"],
             'escape-quote' => ['start', ['bar' => ' \' '], "##teamcity[start bar=' |' ']"],
             'escape-nl' => ['start', ['bar' => " \n "], "##teamcity[start bar=' |n ']"],

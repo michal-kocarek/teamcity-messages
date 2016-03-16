@@ -120,7 +120,7 @@ class Util
         list($microseconds, $timestamp) = explode(' ', microtime());
 
         // extract first six microsecond digits from string "0.12345678" as DateTime won't accept more
-        $microseconds = substr($microseconds, 3, 6);
+        $microseconds = substr($microseconds, 2, 6);
 
         // order of format matters; timestamp sets timezone and set microseconds to zero;
         // that's why microseconds must be set after parsing the timestamp

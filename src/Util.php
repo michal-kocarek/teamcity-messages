@@ -102,8 +102,6 @@ class Util
                 return self::ESCAPE_CHARACTER_MAP[$matches[1]];
             } elseif ($matches[2]) {
                 return '|0x'.$matches[2];
-            } else {
-                throw new LogicException('Unexpected value.');
             }
         }, $value);
     }

@@ -140,9 +140,9 @@ class MessageLoggerTest extends PHPUnit_Framework_TestCase
             ],
             'suite-started' => [
                 function(MessageLogger $logger) {
-                    $logger->testSuiteFinished('Foo');
+                    $logger->testSuiteStarted('Foo');
                 },
-                "##teamcity[testSuiteFinished timestamp='*' name='Foo']",
+                "##teamcity[testSuiteStarted timestamp='*' name='Foo']",
             ],
             'suite-finished' => [
                 function(MessageLogger $logger) {

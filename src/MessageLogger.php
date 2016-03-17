@@ -1,6 +1,7 @@
 <?php
 
 namespace MichalKocarek\TeamcityMessages;
+
 use InvalidArgumentException;
 use MichalKocarek\TeamcityMessages\Writers\Writer;
 

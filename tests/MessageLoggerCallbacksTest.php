@@ -89,6 +89,13 @@ class MessageLoggerCallbacksTest extends PHPUnit_Framework_TestCase
                 },
                 "##teamcity[progressStart timestamp='*' message='Foo']" . PHP_EOL .
                 "##teamcity[progressFinish timestamp='*' message='Foo']"
+            ],
+            'without-service-messages' => [
+                function(MessageLogger $logger, callable $callback) {
+                    return $logger->withoutServiceMessages($callback);
+                },
+                "##teamcity[disableServiceMessages timestamp='*']" . PHP_EOL .
+                "##teamcity[enableServiceMessages timestamp='*']"
             ]
         ];
     }

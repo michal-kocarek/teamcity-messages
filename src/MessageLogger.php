@@ -1,6 +1,7 @@
 <?php
 
 namespace MichalKocarek\TeamcityMessages;
+
 use InvalidArgumentException;
 use MichalKocarek\TeamcityMessages\Writers\Writer;
 
@@ -287,7 +288,7 @@ class MessageLogger
     {
         $this->write('testStarted', [
             'name' => $name,
-            'captureStandardOutput' => $captureStandardOutput,
+            'captureStandardOutput' => $captureStandardOutput ? 'true' : 'false',
         ]);
     }
 
@@ -662,9 +663,9 @@ class MessageLogger
         $this->write('importData', [
             'type' => $type,
             'path' => $path,
-            'parseOutOfDate' => $parseOutOfDate,
-            'whenNoDataPublished' => $whenNoDataPublished,
-            'verbose' => $verbose,
+            'parseOutOfDate' => $parseOutOfDate === null ? null : ($parseOutOfDate ? 'true' : 'false'),
+            'whenNoDataPublished' => $whenNoDataPublished === null ? null : ($whenNoDataPublished ? 'true' : 'false'),
+            'verbose' => $verbose === null ? null : ($verbose ? 'true' : 'false'),
         ]);
     }
     

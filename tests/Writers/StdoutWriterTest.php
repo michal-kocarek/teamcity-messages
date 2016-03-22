@@ -10,11 +10,13 @@ require_once(__DIR__.'/DataProvider.php');
 class StdoutWriterTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * Method accepts messages as an argument.
      * @dataProvider dataProviderWrite
-     * @param array $messages
      */
-    public function testWrite(...$messages)
+    public function testWrite(/* ...$messages */)
     {
+        $messages = func_get_args();
+
         $writer = new StdoutWriter();
 
         ob_start();

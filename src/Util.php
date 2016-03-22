@@ -9,15 +9,6 @@ use LogicException;
 
 class Util
 {
-    const ESCAPE_CHARACTER_MAP = [
-        '\'' => '|\'',
-        "\n" => '|n',
-        "\r" => '|r',
-        '|' => '||',
-        '[' => '|[',
-        ']' => '|]',
-    ];
-
     const TIMESTAMP_FORMAT = 'Y-m-d\TH:i:s.uO';
 
     /**
@@ -97,11 +88,26 @@ class Util
      */
     private static function escape($value)
     {
-        return preg_replace_callback('/([\'\n\r|[\]])|\\\\u(\d{4})/', function($matches) {
+        $escapeCharacterMap = [
+            '\'' => '|\'',
+            "\n" => '|n',
+            "\r" => '|r',
+            '|' => '||',
+            '[' => '|[',
+            ']' => '|]',
+        ];
+
+        return preg_replace_callback(/**
+         * @param $matches
+         * @return mixed|string
+         */
+            '/([\'\n\r|[\]])|\\\\u(\d{4})/', function($matches) use($escapeCharacterMap) {
             if ($matches[1]) {
-                return self::ESCAPE_CHARACTER_MAP[$matches[1]];
+                return $escapeCharacterMap[$matches[1]];
             } elseif ($matches[2]) {
                 return '|0x'.$matches[2];
+            } else {
+                throw new LogicException('Unexpected match combination.');
             }
         }, $value);
     }

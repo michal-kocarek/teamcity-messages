@@ -2,6 +2,7 @@
 
 namespace MichalKocarek\TeamcityMessages;
 
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
@@ -70,7 +71,7 @@ class Util
      * @return string
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-MessageCreationTimestamp
      */
-    public static function formatTimestamp(DateTimeInterface $date = null)
+    public static function formatTimestamp($date = null)
     {
         if (!$date) {
             $date = self::nowMicro();
@@ -115,7 +116,7 @@ class Util
     /**
      * Get current time with microseconds included.
      *
-     * @return DateTimeImmutable
+     * @return DateTimeInterface
      */
     public static function nowMicro()
     {
@@ -128,7 +129,9 @@ class Util
 
         // order of format matters; timestamp sets timezone and set microseconds to zero;
         // that's why microseconds must be set after parsing the timestamp
-        return DateTimeImmutable::createFromFormat('U u', "$timestamp $microseconds");
+        return PHP_VERSION_ID >= 50500
+            ? DateTimeImmutable::createFromFormat('U u', "$timestamp $microseconds")
+            : DateTime::createFromFormat('U u', "$timestamp $microseconds");
     }
 
 }

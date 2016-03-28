@@ -1,7 +1,7 @@
 {
 	"name": "michal-kocarek/teamcity-messages",
 	"description": "Write TeamCity service messages from PHP.",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"keywords": [
 		"teamcity"
 	],
@@ -14,7 +14,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.5"
+		"php": ">=5.4"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^4.8.9",

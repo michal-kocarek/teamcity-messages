@@ -3,7 +3,7 @@
 namespace MichalKocarek\TeamcityMessages\Tests;
 
 use MichalKocarek\TeamcityMessages\Util;
-use DateTimeImmutable;
+use DateTime;
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 
@@ -82,15 +82,15 @@ class UtilTest extends PHPUnit_Framework_TestCase
 
     public function testFormatTimestamp()
     {
-        $now = new DateTimeImmutable('2000-01-01 12:34:56.12345 Europe/Prague');
+        $now = new DateTime('2000-01-01 12:34:56.12345 Europe/Prague');
         self::assertSame('2000-01-01T12:34:56.123450+0100', Util::formatTimestamp($now));
     }
 
     public function testFormatTimestampNow()
     {
-        $now = new DateTimeImmutable();
+        $now = new DateTime();
         $result = Util::formatTimestamp();
 
-        self::assertEquals($now, new DateTimeImmutable($result), '', 1.0);
+        self::assertEquals($now, new DateTime($result), '', 1.0);
     }
 }

@@ -12,7 +12,7 @@ Here is a minimal example of a `composer.json` file that just defines a dependen
 
     {
         "require": {
-            "michal-kocarek/teamcity-messages": "^1.1"
+            "michal-kocarek/teamcity-messages": "^1.2"
         }
     }
 

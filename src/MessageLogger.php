@@ -2,6 +2,7 @@
 
 namespace MichalKocarek\TeamcityMessages;
 
+use Exception;
 use InvalidArgumentException;
 use MichalKocarek\TeamcityMessages\Writers\Writer;
 
@@ -179,14 +180,18 @@ class MessageLogger
      * @param string $description The block description. (Since TeamCity 9.1.5.)
      * @param callable $callback Callback that is called inside block. First argument passed is this instance.
      * @return mixed The callback return value.
+     * @throws Exception Exception raised inside callback may be thrown.
      */
     public function block($name, $description = '', callable $callback)
     {
         $this->blockOpened($name, $description);
         try {
-            return $callback($this);
-        } finally {
+            $result = $callback($this);
             $this->blockClosed($name);
+            return $result;
+        } catch(Exception $ex) {
+            $this->blockClosed($name);
+            throw $ex;
         }
     }
 
@@ -229,6 +234,7 @@ class MessageLogger
      * @param string $compilerName Arbitrary name of compiler performing an operation.
      * @param callable $callback Callback that is called inside block. First argument passed is this instance.
      * @return mixed The callback return value.
+     * @throws Exception Exception raised inside callback may be thrown.
      *
      * @see https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-reportingCompilationBlocksReportingCompilationMessages
      */
@@ -236,9 +242,12 @@ class MessageLogger
     {
         $this->compilationStarted($compilerName);
         try {
-            return $callback($this);
-        } finally {
+            $result = $callback($this);
             $this->compilationFinished($compilerName);
+            return $result;
+        } catch(Exception $ex) {
+            $this->compilationFinished($compilerName);
+            throw $ex;
         }
     }
     
@@ -483,14 +492,18 @@ class MessageLogger
      * @param string $message The message.
      * @param callable $callback Callback that is called inside block. First argument passed is this instance.
      * @return mixed The callback return value.
+     * @throws Exception Exception raised inside callback may be thrown.
      */
     public function progress($message, callable $callback)
     {
         $this->progressStart($message);
         try {
-            return $callback($this);
-        } finally {
+            $result = $callback($this);
             $this->progressFinish($message);
+            return $result;
+        } catch(Exception $ex) {
+            $this->progressFinish($message);
+            throw $ex;
         }
     }
     
@@ -633,14 +646,18 @@ class MessageLogger
      *
      * @param callable $callback Callback that is called inside block. First argument passed is this instance.
      * @return mixed The callback return value.
+     * @throws Exception Exception raised inside callback may be thrown.
      */
     public function withoutServiceMessages(callable $callback)
     {
         $this->disableServiceMessages();
         try {
-            return $callback($this);
-        } finally {
+            $result = $callback($this);
             $this->enableServiceMessages();
+            return $result;
+        } catch(Exception $ex) {
+            $this->enableServiceMessages();
+            throw $ex;
         }
     }
     
@@ -663,9 +680,9 @@ class MessageLogger
         $this->write('importData', [
             'type' => $type,
             'path' => $path,
-            'parseOutOfDate' => $parseOutOfDate === null ? null : ($parseOutOfDate ? 'true' : 'false'),
-            'whenNoDataPublished' => $whenNoDataPublished === null ? null : ($whenNoDataPublished ? 'true' : 'false'),
-            'verbose' => $verbose === null ? null : ($verbose ? 'true' : 'false'),
+            'parseOutOfDate' => $this->castToOptionalBoolean($parseOutOfDate),
+            'whenNoDataPublished' => $this->castToOptionalBoolean($whenNoDataPublished),
+            'verbose' => $this->castToOptionalBoolean($verbose),
         ]);
     }
     
@@ -703,6 +720,21 @@ class MessageLogger
         });
 
         $this->writer->write(Util::format($messageName, $parameters));
+    }
+
+    /**
+     * @param $param
+     * @return null|string
+     */
+    private function castToOptionalBoolean($param)
+    {
+        if ($param === null) {
+            return null;
+        }
+
+        return $param
+            ? 'true'
+            : 'false';
     }
 
 }

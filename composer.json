@@ -1,7 +1,7 @@
 {
 	"name": "michal-kocarek/teamcity-messages",
 	"description": "Write TeamCity service messages from PHP.",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"keywords": [
 		"teamcity"
 	],

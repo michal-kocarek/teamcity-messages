@@ -83,7 +83,7 @@ class UtilTest extends PHPUnit_Framework_TestCase
     public function testFormatTimestamp()
     {
         $now = new DateTime('2000-01-01 12:34:56.12345 Europe/Prague');
-        self::assertSame('2000-01-01T12:34:56.123450+0100', Util::formatTimestamp($now));
+        self::assertSame('2000-01-01T12:34:56.123+0100', Util::formatTimestamp($now));
     }
 
     public function testFormatTimestampNow()

@@ -76,8 +76,12 @@ class Util
         if (!$date) {
             $date = self::nowMicro();
         }
-        
-        return $date->format(self::TIMESTAMP_FORMAT);
+
+        $formatted = $date->format(self::TIMESTAMP_FORMAT);
+        // We need to pass only 3 microsecond digits.
+        // 2000-01-01T12:34:56.123450+0100 <- before
+        // 2000-01-01T12:34:56.123+0100 <- after
+        return substr($formatted, 0, 23).substr($formatted, 26);
     }
 
     /**
